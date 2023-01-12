@@ -11,7 +11,6 @@ import io.ktor.server.auth.form
 import io.ktor.server.auth.principal
 import io.ktor.server.auth.session
 import io.ktor.server.freemarker.FreeMarkerContent
-import io.ktor.server.html.respondHtml
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.response.respondText
@@ -23,16 +22,7 @@ import io.ktor.server.sessions.clear
 import io.ktor.server.sessions.cookie
 import io.ktor.server.sessions.sessions
 import io.ktor.server.sessions.set
-import kotlinx.html.FormEncType
-import kotlinx.html.FormMethod
-import kotlinx.html.body
-import kotlinx.html.form
-import kotlinx.html.p
-import kotlinx.html.passwordInput
-import kotlinx.html.submitInput
-import kotlinx.html.textInput
 import ru.project.zaicev.cache.UserCache
-import ru.project.zaicev.models.EventBlock
 import ru.project.zaicev.util.AuthenticationFlag
 
 data class UserSession(val name: String, val count: Int) : Principal
