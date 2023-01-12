@@ -5,8 +5,8 @@ import ru.project.zaicev.util.Privileges
 
 class UserCache {
     companion object {
-        private val adminId = UserEntity.generateId()
-        private val userId = UserEntity.generateId()
+        val adminId = UserEntity.generateId()
+        val userId = UserEntity.generateId()
 
         private val userMap = hashMapOf(
             adminId to UserEntity(adminId, "admin", "admin", Privileges.Admin.code),

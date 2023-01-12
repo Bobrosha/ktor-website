@@ -1,4 +1,5 @@
 <#-- @ftlvariable name="listOfBlocks" type="kotlin.collections.List<kotlin.collections.IndexedValue<ru.project.zaicev.models.EventBlock>>" -->
+<#-- @ftlvariable name="earlyResultList" type="kotlin.collections.List<kotlin.collections.List<String>>" -->
 <#import "_layout.ftl" as layout />
 <@layout.header>
     <style>
@@ -11,28 +12,25 @@
         .draggableBlock {
             height: 170px;
             width: 170px;
-            position: absolute;
+            position: unset;
             z-index: 9;
             background-color: #f1f1f1;
             text-align: center;
             border: 1px solid #d3d3d3;
-        }
-
-        .blockHeader {
-            padding: 10px;
-            cursor: move;
-            z-index: 10;
-            background-color: #2196F3;
-            color: #fff;
+            display: inline-block;
         }
 
         .blockNumber {
-            height: 80%;
+            height: 100%;
             font-size: xxx-large;
             color: darkorange;
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+
+        ul b {
+            padding-right: 10px;
         }
 
         .button {
@@ -55,159 +53,227 @@
             --sk-button-margin-vertical: 14px;
             visibility: hidden;
         }
+
+        ul {
+            display: flex;
+        }
     </style>
-
-    <h1>Name Event</h1>
-
-    <p id="instructionText">Перетащите блоки так, чтобы они находились в правильном порядке.</p>
+    <b style="font-size: 39px;">Тест Шульте</b>
+    <p id="instructionText">Нажимайте на блоки в правильном порядке.</p>
 
     <div>
         <b>Время выполнения: </b>
         <p id="timerText" style="margin-top: 0">00:00.000</p>
     </div>
+    <div id="result" style="visibility:hidden; display:inline-block" hidden="hidden">
+        <b> Результаты тестирования: </b>
+        <ul>
+            <b> Первый тест </b>
+            <span id="firstTestResult"> </span>
+        </ul>
+        <ul>
+            <b> Второй тест </b>
+            <span id="secondTestResult"> </span>
+        </ul>
+        <ul>
+            <b> Третий тест </b>
+            <span id="thirdTestResult"> </span>
+        </ul>
+        <ul>
+            <b> Четвертый тест </b>
+            <span id="fourthTestResult"> </span>
+        </ul>
+        <ul>
+            <b> Пятый тест </b>
+            <span id="fifthTestResult"> </span>
+        </ul>
+        <ul>
+            <b> Эффективность работы </b>
+            <span id="efficiencyResult"> </span>
+        </ul>
+        <ul>
+            <b> Степень врабатываемости </b>
+            <span id="workabilityResult"> </span>
+        </ul>
+        <ul>
+            <b> Психическая устойчивость </b>
+            <span id="sustainabilityResult"> </span>
+        </ul>
 
-    <div style="padding-top: 15px; padding-bottom: 15px; -moz-user-select: none; -webkit-user-select: none; user-select: none;">
+    </div>
+
+    <div id="eventTable"
+         style="-moz-user-select: none; -webkit-user-select: none; user-select: none;">
         <table style="display: flex; justify-content: center; align-items: center">
-            <tr>
-                <td id="ceil_1" class="tableCeil"></td>
-                <td id="ceil_2" class="tableCeil"></td>
-                <td id="ceil_3" class="tableCeil"></td>
-                <td id="ceil_4" class="tableCeil"></td>
-            </tr>
-            <tr>
-                <td id="ceil_5" class="tableCeil"></td>
-                <td id="ceil_6" class="tableCeil"></td>
-                <td id="ceil_7" class="tableCeil"></td>
-                <td id="ceil_8" class="tableCeil"></td>
-            </tr>
-            <tr>
-                <td id="ceil_9" class="tableCeil"></td>
-                <td id="ceil_10" class="tableCeil"></td>
-                <td id="ceil_11" class="tableCeil"></td>
-                <td id="ceil_12" class="tableCeil"></td>
-            </tr>
+            <#list listOfBlocks as block>
+                <#if block.index % 5 == 0>
+                    <tr>
+                </#if>
+                <td id="ceil_${block.index}" class="tableCeil">
+                    <div id="draggableBlock_${block.index}" class="draggableBlock">
+                        <div class="blockNumber">
+                            <b id="checkBox_${block.value.blockNumber}">${block.value.blockNumber}</b>
+                        </div>
+                    </div>
+                </td>
+                <#if block.index % 5 == 4>
+                    </tr>
+                </#if>
+            </#list>
         </table>
     </div>
 
-    <#list listOfBlocks as block>
-        <div id="draggableBlock_${block.index}" class="draggableBlock">
-            <div class="blockHeader">
-                Click here and move
-            </div>
-            <div class="blockNumber">
-                <b id="checkBox_${block.value.blockNumber}">${block.value.blockNumber}</b>
-            </div>
-        </div>
-    </#list>
-
-    <form action="/shulte/save" method="post">
-        <input id="inputTimeBox" type="hidden" name="elapsedTime">
-        <input id="inputUserBox" type="hidden" name="username">
-        <button id="saveResultButton" class="button-save" type="submit" name="save-result" value="save-result"
+    <form action="/shulte/save" method="post" id="saveForm">
+        <input id="inputResultList" type="hidden" name="resultList">
+        <button id="saveResultButton" class="button" type="submit" name="save-result" value="save-result"
                 title="Сохранить результат" hidden="hidden">
-        <span>
-            Сохранить результат
-        </span>
+            <span>Сохранить результат</span>
+        </button>
+    </form>
+
+    <form action="/shulte/retryEvent" method="post" id="nextEvent">
+        <input id="resultList" type="hidden" name="resultList">
+        <button id="nextEventButton" class="button" type="submit" name="next-event" value="next-event"
+                title="Следующий тест" hidden="hidden">
+            <span>Следующий тест</span>
         </button>
     </form>
 
     <script>
+        document.getElementById("kotlinKtor").innerHTML = ""
+
+        const resultDiv = document.getElementById("result").innerHTML
+        document.getElementById("result").innerHTML = ""
+
+        const testsResults = []
         const arr = []
+
+        <#--noinspection ES6ConvertVarToLetConst-->
+        var lastElemNumber = 5
+
+        const numberOfTest = 5
+
+        <#--noinspection ES6ConvertVarToLetConst-->
+        var wrongClicks = 0
         <#--noinspection ES6ConvertVarToLetConst-->
         var timerStarted = false
         <#--noinspection ES6ConvertVarToLetConst-->
         var timerInMilliseconds = 0
         <#--noinspection ES6ConvertVarToLetConst-->
         var timerInterval
+        <#--noinspection ES6ConvertVarToLetConst-->
+        var nextRightNumber = 1
+        <#--noinspection ES6ConvertVarToLetConst-->
+        var clickedElement = null
+
+        <#if earlyResultList??>
+        <#list earlyResultList as elem>
+        testsResults.push(["${elem[0]}", "${elem[1]}"])
+        </#list>
+        </#if>
 
         <#list listOfBlocks as block>
-        arr.push(true)
-        dragElement(document.getElementById("draggableBlock_${block.index}"), document.getElementById("ceil_${block.value.blockNumber}"))
-
-        setPositionToCeil(document.getElementById("draggableBlock_${block.index}"), document.getElementById("ceil_${block.index + 1}"))
+        // elemNumber++
+        arr.push(${block.value.blockNumber})
+        initElement(document.getElementById("draggableBlock_${block.index}"), ${block.value.blockNumber})
         </#list>
 
-        function dragElement(element, ceil) {
-            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0
-            element.onmousedown = dragMouseDown
-            element.onmouseup = checkPosition
+        function nextEvent() {
+            console.info("Redirect to next event")
+            console.info(testsResults)
 
-            function dragMouseDown(e) {
+            let resultList = document.getElementById("resultList")
+            let nextEventButton = document.getElementById("nextEventButton")
+
+            resultList.value = testsResults
+
+            nextEventButton.hidden = false
+            nextEventButton.style.visibility = "visible"
+        }
+
+        function initElement(element, trueIndex) {
+            element.onmousedown = dragMouseDown
+
+            function dragMouseDown() {
                 if (!timerStarted) {
                     timerStarted = true
                     timerInterval = setInterval(startTimer, 10)
                 }
 
-                e = e || window.event
-                pos3 = e.clientX
-                pos4 = e.clientY
-                document.onmouseup = closeDragElement
-                document.onmousemove = elementDrag
-            }
+                if (clickedElement != null) {
+                    clickedElement.style.backgroundColor = "#f1f1f1"
+                }
+                clickedElement = element
 
-            function elementDrag(e) {
-                e = e || window.event
+                if (trueIndex === nextRightNumber) {
+                    element.style.backgroundColor = "#14ff00"
 
-                pos1 = pos3 - e.clientX
-                pos2 = pos4 - e.clientY
-                pos3 = e.clientX
-                pos4 = e.clientY
+                    if (nextRightNumber === lastElemNumber) {
+                        rememberAndClean()
+                        clickedElement.style.backgroundColor = "#f1f1f1"
 
-                element.style.top = (element.offsetTop - pos2) + "px"
-                element.style.left = (element.offsetLeft - pos1) + "px"
-            }
-
-            function checkPosition() {
-                let ceilPosition = ceil.getBoundingClientRect()
-
-                const checkboxPoint = 170 / 2
-
-                let checkboxTop = element.offsetTop + checkboxPoint
-                let checkboxLeft = element.offsetLeft + checkboxPoint
-
-                const miss = 15
-
-                let ceilHeight = ceilPosition.height / 2
-                let ceilWidth = ceilPosition.width / 2
-
-                let top = ceilPosition.top + ceilHeight - miss
-                let bottom = ceilPosition.top + ceilHeight + miss
-                let left = ceilPosition.left + ceilWidth - miss
-                let right = ceilPosition.left + ceilWidth + miss
-
-                if (checkboxTop > top && checkboxTop < bottom &&
-                    checkboxLeft > left && checkboxLeft < right) {
-                    ceil.style.border = "3px solid #36ff01"
-
-                    element.onmousedown = null
-                    element.onmouseup = null
-                    element.style.zIndex -= 1
-
-                    let index = element.id.toString().split("_")[1]
-                    arr[index] = false
-
-                    if (arr.findIndex((it) => {
-                        return it === true
-                    }) === -1) {
-                        clearInterval(timerInterval)
-                        document.getElementById("instructionText").innerHTML = "Задание выполнено!"
-
-                        let inputTimeBox = document.getElementById("inputTimeBox")
-                        let inputUserBox = document.getElementById("inputUserBox")
-                        let saveResultButton = document.getElementById("saveResultButton")
-
-                        inputUserBox.value = "Vladislav"
-                        inputTimeBox.value = "00:" + document.getElementById("timerText").textContent
-
-                        saveResultButton.hidden = false
-                        saveResultButton.style.visibility = "visible"
+                        if (testsResults.length === numberOfTest) {
+                            console.info("all tests completed")
+                            allTestsCompleted()
+                        } else {
+                            console.info("next test. len = " + testsResults.length + "/" + numberOfTest)
+                            nextEvent()
+                        }
+                    } else {
+                        nextRightNumber++
                     }
+                } else {
+                    wrongClicks++
+                    element.style.backgroundColor = "#ff0000"
                 }
             }
 
-            function closeDragElement() {
-                document.onmouseup = null
-                document.onmousemove = null
+            function allTestsCompleted() {
+                document.getElementById("result").innerHTML = resultDiv
+                document.getElementById("instructionText").innerHTML = "Задание выполнено!"
+                document.getElementById("eventTable").innerHTML = ""
+
+                let effCount = 0;
+                for (let i = 0; i < testsResults.length; i++)
+                    effCount += Number(testsResults[i][1])
+
+                document.getElementById("firstTestResult").innerHTML = testsResults[0][1] / 100 + " cек"
+                document.getElementById("secondTestResult").innerHTML = testsResults[1][1] / 100 + " cек"
+                document.getElementById("thirdTestResult").innerHTML = testsResults[2][1] / 100 + " cек"
+                document.getElementById("fourthTestResult").innerHTML = testsResults[3][1] / 100 + " cек"
+                document.getElementById("fifthTestResult").innerHTML = testsResults[4][1] / 100 + " cек"
+                document.getElementById("timerText").innerHTML = effCount / 100 + " cек"
+
+                effCount /= 5
+                const sustCount = Number(testsResults[3][1]) / effCount;
+                const workCount = Number(testsResults[0][1]) / effCount;
+
+                document.getElementById("efficiencyResult").innerHTML = Number(effCount / 100).toFixed(2).toString()
+                document.getElementById("workabilityResult").innerHTML = Number(workCount).toFixed(2).toString()
+                document.getElementById("sustainabilityResult").innerHTML = Number(sustCount).toFixed(2).toString()
+
+                let result = document.getElementById("result")
+                result.hidden = false
+                result.style.visibility = "visible"
+
+                let inputResultList = document.getElementById("inputResultList")
+                let saveResultButton = document.getElementById("saveResultButton")
+
+                inputResultList.value = testsResults
+
+                saveResultButton.hidden = false
+                saveResultButton.style.visibility = "visible"
+            }
+
+            function rememberAndClean() {
+                testsResults.push([wrongClicks, timerInMilliseconds])
+
+                document.getElementById("instructionText").innerHTML = "Пройдено тестов " + testsResults.length + " из " + numberOfTest
+
+                <#list listOfBlocks as block>
+                document.getElementById("draggableBlock_${block.index}").onmousedown = null
+                </#list>
+                clearInterval(timerInterval)
             }
 
             function startTimer() {
@@ -221,13 +287,6 @@
 
                 timerElement.innerHTML = (timeInMinutes < 10 ? "0" + timeInMinutes : timeInMinutes) + ":" + (printSeconds < 10 ? "0" + printSeconds : printSeconds) + "." + printMilliseconds
             }
-        }
-
-        function setPositionToCeil(blockElement, ceilElement) {
-            let ceilPosition = ceilElement.getBoundingClientRect()
-
-            blockElement.style.top = ceilPosition.top + 186.25 + "px"
-            blockElement.style.left = ceilPosition.left + "px"
         }
     </script>
 </@layout.header>

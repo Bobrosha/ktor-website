@@ -15,10 +15,8 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.util.getOrFail
-import java.time.LocalTime
 import ru.project.zaicev.cache.ResultList
 import ru.project.zaicev.cache.UserCache
-import ru.project.zaicev.entity.EventResult
 import ru.project.zaicev.entity.ResultEntity
 import ru.project.zaicev.entity.UserEntity
 import ru.project.zaicev.models.EventBlock
@@ -30,9 +28,11 @@ fun Application.configureRouting() {
         static("/static") {
             resources("files")
         }
+
         get("/") {
             call.respondRedirect("shulte")
         }
+
         route("shulte") {
             authenticate("main-page") {
                 get {
@@ -74,6 +74,7 @@ fun Application.configureRouting() {
                     )
                 }
             }
+
             get("instruction") {
                 call.respond(
                     FreeMarkerContent(
@@ -81,34 +82,39 @@ fun Application.configureRouting() {
                     )
                 )
             }
+
+
             get("startEvent") {
                 call.respond(
                     FreeMarkerContent(
-                        "event2.ftl", mapOf("listOfBlocks" to EventBlock.orderedList.shuffled().withIndex().toList())
+                        "event.ftl", mapOf("listOfBlocks" to EventBlock.orderedList.shuffled().withIndex().toList())
                     )
                 )
             }
+
             post("retryEvent") {
                 val formParameters = call.receiveParameters()
                 val resultList = ResultEntity.convertResultList(formParameters.getOrFail("resultList"))
 
                 call.respond(
                     FreeMarkerContent(
-                        "event2.ftl", mapOf(
+                        "event.ftl", mapOf(
                             "listOfBlocks" to EventBlock.orderedList.shuffled().withIndex().toList(),
                             "earlyResultList" to resultList.results
                         )
                     )
                 )
             }
-            post("save") {
-                val formParameters = call.receiveParameters()
-                val resultList = ResultEntity.convertResultList(formParameters.getOrFail("resultList"))
-                val username = formParameters.getOrFail("username")
-                val userEntity = UserCache.getUserByUsername(username) ?: throw RuntimeException("User not found")
-                ResultList.addResultById(userEntity.id, resultList)
-                EventResult.newInstance(username, LocalTime.parse("00:00:00.000"))
-                call.respondRedirect("shulte")
+
+            authenticate("main-page") {
+                post("save") {
+                    val username = call.principal<UserSession>()!!.name
+                    val formParameters = call.receiveParameters()
+                    val resultList = ResultEntity.convertResultList(formParameters.getOrFail("resultList"))
+                    val userEntity = UserCache.getUserByUsername(username) ?: throw RuntimeException("User not found")
+                    ResultList.addResultById(userEntity.id, resultList)
+                    call.respondRedirect("/")
+                }
             }
         }
     }

@@ -13,7 +13,6 @@ import io.ktor.server.auth.session
 import io.ktor.server.freemarker.FreeMarkerContent
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondRedirect
-import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
@@ -22,6 +21,7 @@ import io.ktor.server.sessions.clear
 import io.ktor.server.sessions.cookie
 import io.ktor.server.sessions.sessions
 import io.ktor.server.sessions.set
+import ru.project.zaicev.cache.ResultList
 import ru.project.zaicev.cache.UserCache
 import ru.project.zaicev.util.AuthenticationFlag
 
@@ -31,7 +31,7 @@ fun Application.configureAuthentication() {
     install(Sessions) {
         cookie<UserSession>("user_session") {
             cookie.path = "/"
-            cookie.maxAgeInSeconds = 60
+            cookie.maxAgeInSeconds = 300
         }
     }
     install(Authentication) {
@@ -56,9 +56,9 @@ fun Application.configureAuthentication() {
             }
         }
 
-        session<UserSession>("auth-session") {
+        session<UserSession>("auth-admin-privilege-session") {
             validate { session ->
-                if (session.name.startsWith("admin")) {
+                if (session.name == "admin") {
                     session
                 } else {
                     null
@@ -102,19 +102,22 @@ fun Application.configureAuthentication() {
             }
         }
 
-        authenticate("auth-session") {
+        authenticate("auth-admin-privilege-session") {
             get("/showAllStatistics") {
-                val userSession = call.principal<UserSession>()
-                call.sessions.set(userSession?.copy(count = userSession.count + 1))
-                call.respondText("Hello, ${userSession?.name}! Visit count is ${userSession?.count}.")
+                call.respond(FreeMarkerContent("allStatistics.ftl", mapOf("resultList" to ResultList.getAllResults())))
             }
         }
 
-        authenticate("auth-session") {
+        authenticate("main-page") {
             get("/showPersonalStatistic") {
-                val userSession = call.principal<UserSession>()
-                call.sessions.set(userSession?.copy(count = userSession.count + 1))
-                call.respondText("Hello, ${userSession?.name}! Visit count is ${userSession?.count}.")
+                val userName = call.principal<UserSession>()?.name.toString()
+                val userEntity = UserCache.getUserByUsername(userName) ?: throw RuntimeException("User not found by name $userName")
+                call.respond(
+                    FreeMarkerContent(
+                        "personalStatistic.ftl",
+                        mapOf("resultList" to ResultList.getResultById(userEntity.id))
+                    )
+                )
             }
         }
 

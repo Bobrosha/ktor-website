@@ -1,8 +1,6 @@
 package ru.project.zaicev
 
 import io.ktor.server.application.*
-import ru.project.zaicev.cache.UserCache
-import ru.project.zaicev.entity.UserEntity
 import ru.project.zaicev.plugins.*
 
 fun main(args: Array<String>): Unit =
@@ -15,6 +13,4 @@ fun Application.module() {
     configureTemplating()
     configureSecurity()
     configureRouting()
-
-    UserCache.addUser(UserEntity("1", "asd", "asd", 8))
 }
