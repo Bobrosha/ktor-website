@@ -27,6 +27,9 @@
             justify-content: center;
             align-items: center;
         }
+        .res {
+            padding-right: 10px;
+        }
 
         .button {
             cursor: pointer;
@@ -48,18 +51,59 @@
             --sk-button-margin-vertical: 14px;
             visibility: hidden;
         }
+        ul{
+        display: flex;
+        }
+
     </style>
 
-    <h1>Name Event</h1>
+    <h1>Тест Шульте</h1>
 
-    <p id="instructionText">Перетащите блоки так, чтобы они находились в правильном порядке.</p>
+    <p id="instructionText">Нажимайте на блоки в правильном порядке.</p>
 
     <div>
         <b>Время выполнения: </b>
         <p id="timerText" style="margin-top: 0">00:00.000</p>
     </div>
 
-    <div style="padding-top: 15px; padding-bottom: 15px; -moz-user-select: none; -webkit-user-select: none; user-select: none;">
+    <div id = "result" style = "visibility:hidden; display:inline-block" hidden = "hidden">
+        <b> Результаты тестирования: </b>
+        <ul>
+            <b class = "res"> Первый тест </b>
+            <span id = "firstTestResult"> </span>
+        </ul>
+        <ul>
+            <b class = "res"> Второй тест </b>
+            <span id = "secondTestResult"> </span>
+        </ul>
+        <ul>
+            <b class = "res"> Третий тест </b>
+            <span id = "thirdTestResult"> </span>
+        </ul>
+        <ul>
+            <b class = "res"> Четвертый тест </b>
+            <span id = "fourthTestResult"> </span>
+        </ul>
+        <ul>
+            <b class = "res"> Пятый тест </b>
+            <span id = "fifthTestResult"> </span>
+        </ul>
+        <ul>
+            <b class = "res"> Эффективность работы </b>
+            <span id = "efficiencyResult"> </span>
+        </ul>
+        <ul>
+             <b class = "res"> Степень вырабатываемости </b>
+             <span id = "workabilityResult"> </span>
+        </ul>
+        <ul>
+             <b class = "res"> Психическая устойчивость </b>
+             <span id = "sustainabilityResult"> </span>
+        </ul>
+
+    </div>
+
+    <div id = "eventTable" style="padding-top: 15px; padding-bottom: 15px; -moz-user-select: none; -webkit-user-select: none; user-select: none;">
         <form action="/shulte/save" method="post" id="saveForm">
             <input id="inputTimeBox" type="hidden" name="elapsedTime">
             <input id="inputUserBox" type="hidden" name="username">
@@ -127,6 +171,9 @@
     <script>
         const testsResults = []
         const arr = []
+        const resultDiv = document.getElementById("result").innerHTML
+
+        document.getElementById("result").innerHTML = ""
 
         <#--noinspection ES6ConvertVarToLetConst-->
         var lastElemNumber = 5
@@ -218,12 +265,52 @@
             }
 
             function allTestsCompleted() {
+                document.getElementById("result").innerHTML = resultDiv
                 document.getElementById("instructionText").innerHTML = "Задание выполнено!"
 
                 <#list listOfBlocks as block>
                 document.getElementById("draggableBlock_${block.index}").style.visibility = "hidden"
                 document.getElementById("ceil_${block.index + 1}").style.visibility = "hidden"
                 </#list>
+
+                let result = document.getElementById("result")
+                let firstTest = document.getElementById("firstTestResult")
+                let secondTest = document.getElementById("secondTestResult")
+                let thirdTest = document.getElementById("thirdTestResult")
+                let fourthTest = document.getElementById("fourthTestResult")
+                let fifthTest = document.getElementById("fifthTestResult")
+                let sustainability = document.getElementById("sustainabilityResult")
+                let efficiency = document.getElementById("efficiencyResult")
+                let workability = document.getElementById("workabilityResult")
+                let timer = document.getElementById("timerText")
+
+
+                var effCount = 0
+                for(let i = 0; i < testsResults.length; i++)
+                   effCount += Number(testsResults[i][1])
+                console.info(effCount)
+             
+
+                
+                firstTest.innerHTML = testsResults[0][1]/100 + " cек"
+                secondTest.innerHTML = testsResults[1][1]/100 + " cек"
+                thirdTest.innerHTML = testsResults[2][1]/100 + " cек"
+                fourthTest.innerHTML = testsResults[3][1]/100 + " cек"
+                fifthTest.innerHTML = testsResults[4][1]/100 + " cек"
+                timer.innerHTML = effCount/100 + " cек"
+
+                effCount /= 5
+                var sustCount = Number(testsResults[3][1])/effCount
+                var workCount = Number(testsResults[0][1])/effCount
+
+                efficiency.innerHTML = Number(effCount/100).toFixed(2).toString()
+                workability.innerHTML =  Number(workCount).toFixed(2).toString()
+                sustainability.innerHTML = Number(sustCount).toFixed(2).toString()
+               
+                
+
+                result.hidden = false
+                result.style.visibility = "visible"
 
 
                 let inputTimeBox = document.getElementById("inputTimeBox")
@@ -235,6 +322,8 @@
 
                 saveResultButton.hidden = false
                 saveResultButton.style.visibility = "visible"
+
+                document.getElementById("eventTable").innerHTML = ""
             }
 
             function rememberAndClean() {
