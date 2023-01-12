@@ -47,7 +47,12 @@ fun Application.configureAuthentication() {
                 }
             }
             challenge {
-                call.respond(FreeMarkerContent("authentication.ftl", mapOf("authFlag" to AuthenticationFlag.WrongPassword)))
+                call.respond(
+                    FreeMarkerContent(
+                        "authentication.ftl",
+                        mapOf("authFlag" to AuthenticationFlag.WrongPassword)
+                    )
+                )
             }
         }
 
@@ -61,17 +66,18 @@ fun Application.configureAuthentication() {
             }
             challenge {
                 call.sessions.clear<UserSession>()
-                call.respond(FreeMarkerContent("authentication.ftl", mapOf("authFlag" to AuthenticationFlag.WrongPrivilege)))
+                call.respond(
+                    FreeMarkerContent(
+                        "authentication.ftl",
+                        mapOf("authFlag" to AuthenticationFlag.WrongPrivilege)
+                    )
+                )
             }
         }
 
         session<UserSession>("main-page") {
             validate { session ->
-                if (session.name != null) {
-                    session
-                } else {
-                    null
-                }
+                session
             }
             challenge {
                 call.respond(FreeMarkerContent("index.ftl", null))
@@ -98,6 +104,14 @@ fun Application.configureAuthentication() {
 
         authenticate("auth-session") {
             get("/showAllStatistics") {
+                val userSession = call.principal<UserSession>()
+                call.sessions.set(userSession?.copy(count = userSession.count + 1))
+                call.respondText("Hello, ${userSession?.name}! Visit count is ${userSession?.count}.")
+            }
+        }
+
+        authenticate("auth-session") {
+            get("/showPersonalStatistic") {
                 val userSession = call.principal<UserSession>()
                 call.sessions.set(userSession?.copy(count = userSession.count + 1))
                 call.respondText("Hello, ${userSession?.name}! Visit count is ${userSession?.count}.")

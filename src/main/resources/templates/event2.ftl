@@ -238,7 +238,7 @@
             }
 
             function rememberAndClean() {
-                testsResults.push([wrongClicks, "00:" + document.getElementById("timerText").innerHTML])
+                testsResults.push([wrongClicks, timerInMilliseconds])
 
                 document.getElementById("instructionText").innerHTML = "Пройдено тестов " + testsResults.length + " из " + numberOfTest
 

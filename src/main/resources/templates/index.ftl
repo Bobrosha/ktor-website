@@ -25,7 +25,7 @@
             border-radius: 25px;
             height: fit-content;
             display: inline-flex;
-            background-color: rgba(0, 0, 0, 0.4);
+            background-color: #0071e3;
             -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
             align-items: center;
@@ -62,7 +62,7 @@
         }
 
         .menu-bar li:hover::before {
-            background: linear-gradient(to bottom, #e8edec, #d2d1d3);
+            background: linear-gradient(140deg, #42a5e3, #ff8900);
             box-shadow: 0 3px 20px 0 black;
             transform: scale(1.2);
         }
@@ -72,10 +72,10 @@
             <li>${username}</li>
             <li><a href="/logout">Выйти из аккаунта</a></li>
             <li><a href="/shulte/startEvent">Начать тестирование</a></li>
-            <li><a href="/">Просмотреть личные результаты</a></li>
+            <li><a href="/showPersonalStatistic">Просмотреть личные результаты</a></li>
 
             <#if username == "admin">
-                <li><a href="/">Просмотреть общие результаты</a></li>
+                <li><a href="/showAllStatistics">Просмотреть общие результаты</a></li>
             </#if>
         <#else>
             <li><a href="/login">Войти в аккаунт</a></li>

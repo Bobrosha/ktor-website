@@ -47,7 +47,7 @@
             text-rendering: auto;
             word-spacing: normal;
             text-transform: none;
-            text-indent: 0px;
+            text-indent: 0;
             text-shadow: none;
             -webkit-rtl-ordering: logical;
             cursor: text;
@@ -65,7 +65,7 @@
             text-rendering: auto;
             word-spacing: normal;
             text-transform: none;
-            text-indent: 0px;
+            text-indent: 0;
             text-shadow: none;
             -webkit-rtl-ordering: logical;
             cursor: text;
