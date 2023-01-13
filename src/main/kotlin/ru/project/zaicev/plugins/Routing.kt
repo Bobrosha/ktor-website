@@ -38,7 +38,6 @@ fun Application.configureRouting() {
                 get {
                     val userSession = call.principal<UserSession>()
 
-                    println("User session: $userSession")
                     if (userSession == null) {
                         call.respond(FreeMarkerContent("index.ftl", null))
                     } else {

@@ -147,14 +147,11 @@
 
         const testsResults = []
         const arr = []
+        const numberOfTest = 5
 
         <#--noinspection ES6ConvertVarToLetConst-->
         var lastElemNumber = 25
 
-        const numberOfTest = 5
-
-        <#--noinspection ES6ConvertVarToLetConst-->
-        var wrongClicks = 0
         <#--noinspection ES6ConvertVarToLetConst-->
         var timerStarted = false
         <#--noinspection ES6ConvertVarToLetConst-->
@@ -165,6 +162,8 @@
         var nextRightNumber = 1
         <#--noinspection ES6ConvertVarToLetConst-->
         var clickedElement = null
+        <#--noinspection ES6ConvertVarToLetConst-->
+        var wrongClicks = 0
 
         <#if earlyResultList??>
         <#list earlyResultList as elem>
@@ -173,15 +172,11 @@
         </#if>
 
         <#list listOfBlocks as block>
-        // elemNumber++
         arr.push(${block.value.blockNumber})
         initElement(document.getElementById("draggableBlock_${block.index}"), ${block.value.blockNumber})
         </#list>
 
         function nextEvent() {
-            console.info("Redirect to next event")
-            console.info(testsResults)
-
             let resultList = document.getElementById("resultList")
             let nextEventButton = document.getElementById("nextEventButton")
 
@@ -213,10 +208,8 @@
                         clickedElement.style.backgroundColor = "#f1f1f1"
 
                         if (testsResults.length === numberOfTest) {
-                            console.info("all tests completed")
                             allTestsCompleted()
                         } else {
-                            console.info("next test. len = " + testsResults.length + "/" + numberOfTest)
                             nextEvent()
                         }
                     } else {
