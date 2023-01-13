@@ -149,7 +149,7 @@
         const arr = []
 
         <#--noinspection ES6ConvertVarToLetConst-->
-        var lastElemNumber = 5
+        var lastElemNumber = 25
 
         const numberOfTest = 5
 
